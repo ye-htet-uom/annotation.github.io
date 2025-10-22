@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Labeling Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Hide the default file input */
+        #folder-upload {
+            display: none;
+        }
+        /* Custom scrollbar for checklist */
+        .checklist-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .checklist-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .checklist-scroll::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .checklist-scroll::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+
+    <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header and Upload Button -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                 <div class="mb-4 sm:mb-0">
+                    <h1 class="text-3xl font-bold text-gray-900">Image Annotation Tool</h1>
+                    <p class="text-gray-600 mt-1">Upload a folder to start labeling images.</p>
+                </div>
+                <label for="folder-upload" class="cursor-pointer bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h5.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm8 1a1 1 0 00-1 1v3h3a1 1 0 100-2h-2V7a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Upload Folder
+                </label>
+                <input type="file" id="folder-upload" webkitdirectory directory multiple>
+            </div>
+
+            <!-- Main Content: Image and Checklist -->
+            <div id="main-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Image Viewer -->
+                <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex flex-col">
+                    <!-- Changed min-h to h for fixed size -->
+                    <div class="flex-grow flex items-center justify-center bg-gray-200 rounded-lg h-[400px] lg:h-[600px] overflow-hidden">
+                        <img id="image-display" src="https://placehold.co/800x600/e2e8f0/cbd5e0?text=Upload+a+folder" alt="Selected image" class="w-full h-full object-cover rounded-md">
+                    </div>
+                    <div id="image-info" class="text-center mt-4 text-lg font-medium text-gray-700">
+                        <!-- Image name and count will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Checklist & Actions Panel -->
+                <div id="checklist-panel" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col">
+                    <h2 class="text-xl font-bold mb-4">Select Identities</h2>
+                    <div id="checklist" class="space-y-3 flex-grow overflow-y-auto checklist-scroll pr-2">
+                        <!-- Checkboxes will be dynamically inserted here -->
+                    </div>
+                    <!-- Navigation Buttons (Moved Here) -->
+                    <div id="navigation-buttons" class="mt-auto pt-6 border-t border-gray-200 space-y-3">
+                        <div class="flex space-x-3">
+                            <button id="prev-button" class="w-full py-3 px-4 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+                            <button id="next-button" class="w-full py-3 px-4 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">Next</button>
+                        </div>
+                        <button id="stop-button" class="w-full py-3 px-4 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hidden">Stop & Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Welcome/Initial Message -->
+            <div id="welcome-message" class="text-center py-20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h3 class="mt-2 text-xl font-medium text-gray-900">No images loaded</h3>
+                <p class="mt-1 text-md text-gray-500">Click "Upload Folder" to begin the annotation process.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center p-4 text-sm text-gray-500">
+        <p>Data Labeling Interface &copy; 2024</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // UI Elements
+            const folderUpload = document.getElementById('folder-upload');
+            const imageDisplay = document.getElementById('image-display');
+            const imageInfo = document.getElementById('image-info');
+            const checklistContainer = document.getElementById('checklist');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const stopButton = document.getElementById('stop-button');
+            const mainContent = document.getElementById('main-content');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const checklistPanel = document.getElementById('checklist-panel');
+            // No longer need navButtons wrapper
+
+            // --- State Management ---
+            let imageFiles = [];
+            let currentIndex = 0;
+            let labels = new Map();
+            let folderName = '';
+
+            // Identity List
+            const identities = [
+                'Abdurrahman Wahid', 'Agus Harimurti Yudhoyono', 'Airlangga Hartarto', 'Anies Rasyid Baswedan',
+                'Baharuddin Jusuf Habibie', 'Boediono', 'Erick Thohir', 'Ganjar Pranowo', 'Gibran Rakabuming Raka',
+                'Joko Widodo', 'Jusuf Kalla', 'Mahfud MD', 'Maruf Amin', 'Megawati Sukarnoputri', 'Muhaimin Iskandar',
+                'Prabowo Subianto', 'Soekarno', 'Sri Mulyani Indrawati', 'Suharto', 'Susilo Bambang Yudhoyono',
+                'Unknown'
+            ];
+
+            // --- Initialization ---
+            function initializeChecklist() {
+                checklistContainer.innerHTML = '';
+                identities.forEach(name => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center';
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.id = `radio-${name}`;
+                    radio.name = 'identity';
+                    radio.value = name;
+                    radio.className = 'h-4 w-4 flex-shrink-0 text-blue-600 border-gray-300 rounded focus:ring-blue-500';
+                    const label = document.createElement('label');
+                    label.htmlFor = `radio-${name}`;
+                    label.textContent = name;
+                    label.className = 'ml-3 block text-md text-gray-700';
+                    div.appendChild(radio);
+                    div.appendChild(label);
+                    checklistContainer.appendChild(div);
+                });
+            }
+
+            // --- Core Functions ---
+            function displayImage(index) {
+                if (index < 0 || index >= imageFiles.length) return;
+
+                const file = imageFiles[index];
+                imageDisplay.src = URL.createObjectURL(file);
+                imageInfo.textContent = `${file.name} (${index + 1} of ${imageFiles.length})`;
+
+                loadLabelsForCurrentImage();
+                updateNavButtons();
+            }
+
+            function saveCurrentLabels() {
+                const currentFileName = imageFiles[currentIndex].name;
+                const selectedRadio = checklistContainer.querySelector('input[type="radio"]:checked');
+                const selectedValue = selectedRadio ? selectedRadio.value : null;
+                labels.set(currentFileName, selectedValue);
+            }
+
+            function loadLabelsForCurrentImage() {
+                const currentFileName = imageFiles[currentIndex].name;
+                const savedLabel = labels.get(currentFileName);
+
+                checklistContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = (radio.value === savedLabel);
+                });
+            }
+
+            function updateNavButtons() {
+                prevButton.disabled = currentIndex === 0;
+
+                const isLastImage = currentIndex === imageFiles.length - 1;
+
+                if (isLastImage && imageFiles.length > 0) {
+                    nextButton.classList.add('hidden');
+                    stopButton.classList.remove('hidden');
+                } else {
+                    nextButton.classList.remove('hidden');
+                    stopButton.classList.add('hidden');
+                }
+            }
+
+            function resetUI() {
+                imageFiles = [];
+                currentIndex = 0;
+                labels.clear();
+                folderName = '';
+                mainContent.classList.add('hidden');
+                welcomeMessage.classList.remove('hidden');
+                imageDisplay.src = 'https://placehold.co/800x600/e2e8f0/cbd5e0?text=Upload+a+folder';
+                imageInfo.textContent = '';
+                // Ensure buttons are reset to initial state
+                updateNavButtons();
+            }
+
+            function generateReport() {
+                const identityCounts = {};
+                const allIdentities = new Set();
+                const totalFrames = imageFiles.length;
+
+                if (totalFrames === 0) return "No images were labeled.";
+
+                identities.forEach(id => {
+                    identityCounts[id] = 0;
+                });
+
+                for (const label of labels.values()) {
+                    if (label && identityCounts[label] !== undefined) {
+                        identityCounts[label]++;
+                        allIdentities.add(label);
+                    }
+                }
+
+                const includedIdentities = Array.from(allIdentities).sort();
+
+                let maxCount = 0;
+                for(const identity of includedIdentities) {
+                    if (identityCounts[identity] > maxCount) {
+                        maxCount = identityCounts[identity];
+                    }
+                }
+
+                const dominanceCharacters = [];
+                if (maxCount > 0) {
+                     for(const identity of includedIdentities) {
+                        if (identityCounts[identity] === maxCount) {
+                            dominanceCharacters.push(identity);
+                        }
+                    }
+                }
+
+                let report = `The video includes the faces of: ${includedIdentities.length > 0 ? includedIdentities.join(', ') : 'None'}\n\n`;
+                report += `Total Frames: ${totalFrames}\n\n`;
+                includedIdentities.forEach(identity => {
+                    const count = identityCounts[identity];
+                    const percentage = ((count / totalFrames) * 100).toFixed(2);
+                    report += `Count of ${identity}: ${count} (${percentage}%)\n`;
+                });
+                report += `\nDominance Character(s): ${dominanceCharacters.length > 0 ? dominanceCharacters.join(', ') : 'None'}\n`;
+
+                return report;
+            }
+
+            function downloadReport(content, fileName) {
+                const a = document.createElement('a');
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                a.setAttribute('href', url);
+                a.setAttribute('download', fileName);
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            // --- Event Listeners ---
+            folderUpload.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    const firstFile = e.target.files[0];
+                    if (firstFile && firstFile.webkitRelativePath) {
+                        const pathParts = firstFile.webkitRelativePath.split('/');
+                        folderName = pathParts.length > 1 ? pathParts[0] : 'labeled_folder';
+                    } else {
+                        folderName = 'labeled_folder';
+                    }
+
+                    imageFiles = Array.from(e.target.files)
+                        .filter(file => file.type.startsWith('image/'))
+                        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+                    if (imageFiles.length > 0) {
+                        currentIndex = 0;
+                        labels.clear();
+                        displayImage(currentIndex);
+                        mainContent.classList.remove('hidden');
+                        welcomeMessage.classList.add('hidden');
+                    } else {
+                        alert("The selected folder contains no images. Please choose a folder with image files.");
+                        resetUI();
+                    }
+                }
+            });
+
+            prevButton.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    saveCurrentLabels();
+                    currentIndex--;
+                    displayImage(currentIndex);
+                }
+            });
+
+            nextButton.addEventListener('click', () => {
+                const selectedRadio = checklistContainer.querySelector('input[type="radio"]:checked');
+
+                if (!selectedRadio) {
+                    checklistPanel.classList.add('border-red-500', 'border-2');
+
+                    if (!checklistPanel.querySelector('.error-message')) {
+                        const errorMessage = document.createElement('p');
+                        errorMessage.textContent = 'Please select a label to continue.';
+                        errorMessage.className = 'error-message text-red-600 text-sm mt-2 text-center font-semibold';
+                        // Insert error message before the buttons
+                        const navContainer = document.getElementById('navigation-buttons');
+                        checklistPanel.insertBefore(errorMessage, navContainer);
+                    }
+
+                    setTimeout(() => {
+                        checklistPanel.classList.remove('border-red-500', 'border-2');
+                        const errorMessage = checklistPanel.querySelector('.error-message');
+                        if (errorMessage) {
+                            errorMessage.remove();
+                        }
+                    }, 2500);
+                    return;
+                }
+
+                if (currentIndex < imageFiles.length - 1) {
+                    saveCurrentLabels();
+                    currentIndex++;
+                    displayImage(currentIndex);
+                }
+            });
+
+            stopButton.addEventListener('click', () => {
+                if (imageFiles.length === 0) return;
+
+                saveCurrentLabels();
+
+                const reportContent = generateReport();
+                const reportFileName = `${folderName}_labelling_report.txt`;
+                downloadReport(reportContent, reportFileName);
+
+                alert("Labeling finished! Your report has been downloaded.");
+                resetUI();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (mainContent.classList.contains('hidden')) return;
+
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault(); // Prevent default browser action
+                    prevButton.click();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault(); // Prevent default browser action
+                    // Only click if the button is not hidden
+                    if (!nextButton.classList.contains('hidden')) {
+                         nextButton.click();
+                    }
+                }
+            });
+
+            // Initial call
+            initializeChecklist();
+        });
+    </script>
+</body>
+</html>
+
+
