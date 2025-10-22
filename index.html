@@ -354,6 +354,30 @@
 
             stopButton.addEventListener('click', () => {
                 if (imageFiles.length === 0) return;
+
+                const selectedCheckboxes = checklistContainer.querySelectorAll('input[type="checkbox"]:checked');
+                
+                // Add validation check before saving
+                if (selectedCheckboxes.length === 0) {
+                    checklistPanel.classList.add('border-red-500', 'border-2');
+                    
+                    if (!checklistPanel.querySelector('.error-message')) {
+                        const errorMessage = document.createElement('p');
+                        errorMessage.textContent = 'Please select a label to finish.';
+                        errorMessage.className = 'error-message text-red-600 text-sm mt-2 text-center font-semibold';
+                        const navContainer = document.getElementById('navigation-buttons');
+                        checklistPanel.insertBefore(errorMessage, navContainer);
+                    }
+
+                    setTimeout(() => {
+                        checklistPanel.classList.remove('border-red-500', 'border-2');
+                        const errorMessage = checklistPanel.querySelector('.error-message');
+                        if (errorMessage) {
+                            errorMessage.remove();
+                        }
+                    }, 2500);
+                    return; 
+                }
                 
                 saveCurrentLabels();
                 
@@ -386,5 +410,6 @@
     </script>
 </body>
 </html>
+
 
 
