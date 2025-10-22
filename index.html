@@ -54,7 +54,6 @@
             <div id="main-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Image Viewer -->
                 <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex flex-col">
-                    <!-- Changed min-h to h for fixed size -->
                     <div class="flex-grow flex items-center justify-center bg-gray-200 rounded-lg h-[400px] lg:h-[600px] overflow-hidden">
                         <img id="image-display" src="https://placehold.co/800x600/e2e8f0/cbd5e0?text=Upload+a+folder" alt="Selected image" class="w-full h-full object-cover rounded-md">
                     </div>
@@ -65,7 +64,7 @@
 
                 <!-- Checklist & Actions Panel -->
                 <div id="checklist-panel" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col">
-                    <h2 class="text-xl font-bold mb-4">Select Identities</h2>
+                    <h2 class="text-xl font-bold mb-4">Select Identities (Multiple)</h2>
                     <div id="checklist" class="space-y-3 flex-grow overflow-y-auto checklist-scroll pr-2">
                         <!-- Checkboxes will be dynamically inserted here -->
                     </div>
@@ -79,7 +78,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Welcome/Initial Message -->
             <div id="welcome-message" class="text-center py-20">
                 <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,7 +90,7 @@
 
         </div>
     </main>
-
+    
     <footer class="text-center p-4 text-sm text-gray-500">
         <p>CSEAS Project (Data Labeling Interface) &copy; 2025</p>
     </footer>
@@ -109,20 +108,19 @@
             const mainContent = document.getElementById('main-content');
             const welcomeMessage = document.getElementById('welcome-message');
             const checklistPanel = document.getElementById('checklist-panel');
-            // No longer need navButtons wrapper
 
             // --- State Management ---
             let imageFiles = [];
             let currentIndex = 0;
             let labels = new Map();
-            let folderName = '';
+            let folderName = ''; 
 
             // Identity List
             const identities = [
-                'Abdurrahman Wahid', 'Agus Harimurti Yudhoyono', 'Airlangga Hartarto', 'Anies Rasyid Baswedan',
-                'Baharuddin Jusuf Habibie', 'Boediono', 'Erick Thohir', 'Ganjar Pranowo', 'Gibran Rakabuming Raka',
-                'Joko Widodo', 'Jusuf Kalla', 'Mahfud MD', 'Maruf Amin', 'Megawati Sukarnoputri', 'Muhaimin Iskandar',
-                'Prabowo Subianto', 'Soekarno', 'Sri Mulyani Indrawati', 'Suharto', 'Susilo Bambang Yudhoyono',
+                'Abdurrahman Wahid', 'Agus Harimurti Yudhoyono', 'Airlangga Hartarto', 'Anies Rasyid Baswedan', 
+                'Baharuddin Jusuf Habibie', 'Boediono', 'Erick Thohir', 'Ganjar Pranowo', 'Gibran Rakabuming Raka', 
+                'Joko Widodo', 'Jusuf Kalla', 'Mahfud MD', 'Maruf Amin', 'Megawati Sukarnoputri', 'Muhaimin Iskandar', 
+                'Prabowo Subianto', 'Soekarno', 'Sri Mulyani Indrawati', 'Suharto', 'Susilo Bambang Yudhoyono', 
                 'Unknown'
             ];
 
@@ -132,17 +130,16 @@
                 identities.forEach(name => {
                     const div = document.createElement('div');
                     div.className = 'flex items-center';
-                    const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.id = `radio-${name}`;
-                    radio.name = 'identity';
-                    radio.value = name;
-                    radio.className = 'h-4 w-4 flex-shrink-0 text-blue-600 border-gray-300 rounded focus:ring-blue-500';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `check-${name}`;
+                    checkbox.value = name;
+                    checkbox.className = 'h-4 w-4 flex-shrink-0 text-blue-600 border-gray-300 rounded focus:ring-blue-500';
                     const label = document.createElement('label');
-                    label.htmlFor = `radio-${name}`;
+                    label.htmlFor = `check-${name}`;
                     label.textContent = name;
                     label.className = 'ml-3 block text-md text-gray-700';
-                    div.appendChild(radio);
+                    div.appendChild(checkbox);
                     div.appendChild(label);
                     checklistContainer.appendChild(div);
                 });
@@ -151,28 +148,28 @@
             // --- Core Functions ---
             function displayImage(index) {
                 if (index < 0 || index >= imageFiles.length) return;
-
+                
                 const file = imageFiles[index];
                 imageDisplay.src = URL.createObjectURL(file);
                 imageInfo.textContent = `${file.name} (${index + 1} of ${imageFiles.length})`;
-
+                
                 loadLabelsForCurrentImage();
                 updateNavButtons();
             }
 
             function saveCurrentLabels() {
                 const currentFileName = imageFiles[currentIndex].name;
-                const selectedRadio = checklistContainer.querySelector('input[type="radio"]:checked');
-                const selectedValue = selectedRadio ? selectedRadio.value : null;
-                labels.set(currentFileName, selectedValue);
+                const selectedCheckboxes = checklistContainer.querySelectorAll('input[type="checkbox"]:checked');
+                const selectedValues = Array.from(selectedCheckboxes).map(cb => cb.value);
+                labels.set(currentFileName, selectedValues); // Store an array of labels
             }
 
             function loadLabelsForCurrentImage() {
                 const currentFileName = imageFiles[currentIndex].name;
-                const savedLabel = labels.get(currentFileName);
-
-                checklistContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.checked = (radio.value === savedLabel);
+                const savedLabels = labels.get(currentFileName) || []; // Default to an empty array
+                
+                checklistContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = savedLabels.includes(checkbox.value);
                 });
             }
 
@@ -189,17 +186,16 @@
                     stopButton.classList.add('hidden');
                 }
             }
-
+            
             function resetUI() {
                 imageFiles = [];
                 currentIndex = 0;
                 labels.clear();
-                folderName = '';
+                folderName = ''; 
                 mainContent.classList.add('hidden');
                 welcomeMessage.classList.remove('hidden');
                 imageDisplay.src = 'https://placehold.co/800x600/e2e8f0/cbd5e0?text=Upload+a+folder';
                 imageInfo.textContent = '';
-                // Ensure buttons are reset to initial state
                 updateNavButtons();
             }
 
@@ -214,22 +210,27 @@
                     identityCounts[id] = 0;
                 });
 
-                for (const label of labels.values()) {
-                    if (label && identityCounts[label] !== undefined) {
-                        identityCounts[label]++;
-                        allIdentities.add(label);
+                // Iterate through arrays of labels for each image
+                for (const labelArray of labels.values()) {
+                    if (labelArray && labelArray.length > 0) {
+                        labelArray.forEach(label => {
+                            if (identityCounts[label] !== undefined) {
+                                identityCounts[label]++;
+                                allIdentities.add(label);
+                            }
+                        });
                     }
                 }
 
                 const includedIdentities = Array.from(allIdentities).sort();
-
+                
                 let maxCount = 0;
                 for(const identity of includedIdentities) {
                     if (identityCounts[identity] > maxCount) {
                         maxCount = identityCounts[identity];
                     }
                 }
-
+                
                 const dominanceCharacters = [];
                 if (maxCount > 0) {
                      for(const identity of includedIdentities) {
@@ -247,7 +248,7 @@
                     report += `Count of ${identity}: ${count} (${percentage}%)\n`;
                 });
                 report += `\nDominance Character(s): ${dominanceCharacters.length > 0 ? dominanceCharacters.join(', ') : 'None'}\n`;
-
+                
                 return report;
             }
 
@@ -298,16 +299,18 @@
             });
 
             nextButton.addEventListener('click', () => {
-                const selectedRadio = checklistContainer.querySelector('input[type="radio"]:checked');
+                const selectedCheckboxes = checklistContainer.querySelectorAll('input[type="checkbox"]:checked');
 
-                if (!selectedRadio) {
+                // Allow proceeding with zero labels, but save the empty selection
+                // This logic is now handled by just saving and moving on.
+                // The check can be removed if you want to allow blank labels.
+                if (selectedCheckboxes.length === 0) {
                     checklistPanel.classList.add('border-red-500', 'border-2');
-
+                    
                     if (!checklistPanel.querySelector('.error-message')) {
                         const errorMessage = document.createElement('p');
                         errorMessage.textContent = 'Please select a label to continue.';
                         errorMessage.className = 'error-message text-red-600 text-sm mt-2 text-center font-semibold';
-                        // Insert error message before the buttons
                         const navContainer = document.getElementById('navigation-buttons');
                         checklistPanel.insertBefore(errorMessage, navContainer);
                     }
@@ -319,7 +322,7 @@
                             errorMessage.remove();
                         }
                     }, 2500);
-                    return;
+                    return; 
                 }
 
                 if (currentIndex < imageFiles.length - 1) {
@@ -331,13 +334,13 @@
 
             stopButton.addEventListener('click', () => {
                 if (imageFiles.length === 0) return;
-
+                
                 saveCurrentLabels();
-
+                
                 const reportContent = generateReport();
                 const reportFileName = `${folderName}_labelling_report.txt`;
                 downloadReport(reportContent, reportFileName);
-
+                
                 alert("Labeling finished! Your report has been downloaded.");
                 resetUI();
             });
@@ -347,23 +350,20 @@
                 if (mainContent.classList.contains('hidden')) return;
 
                 if (e.key === 'ArrowLeft') {
-                    e.preventDefault(); // Prevent default browser action
+                    e.preventDefault(); 
                     prevButton.click();
                 } else if (e.key === 'ArrowRight') {
-                    e.preventDefault(); // Prevent default browser action
-                    // Only click if the button is not hidden
+                    e.preventDefault(); 
                     if (!nextButton.classList.contains('hidden')) {
                          nextButton.click();
                     }
                 }
             });
-
+            
             // Initial call
             initializeChecklist();
         });
     </script>
 </body>
 </html>
-
-
 
