@@ -231,11 +231,31 @@
                     }
                 }
                 
-                const dominanceCharacters = [];
+                let dominanceCharacters = [];
                 if (maxCount > 0) {
                      for(const identity of includedIdentities) {
                         if (identityCounts[identity] === maxCount) {
                             dominanceCharacters.push(identity);
+                        }
+                    }
+                }
+
+                // If 'Unknown' is the sole dominant character, find the second dominant one.
+                if (dominanceCharacters.length === 1 && dominanceCharacters[0] === 'Unknown') {
+                    let secondMaxCount = 0;
+                    // Find the second highest count among all other identities
+                    for (const identity of includedIdentities) {
+                        if (identity !== 'Unknown' && identityCounts[identity] > secondMaxCount) {
+                            secondMaxCount = identityCounts[identity];
+                        }
+                    }
+
+                    // If a second dominant character exists, add them to the list.
+                    if (secondMaxCount > 0) {
+                        for (const identity of includedIdentities) {
+                            if (identity !== 'Unknown' && identityCounts[identity] === secondMaxCount) {
+                                dominanceCharacters.push(identity);
+                            }
                         }
                     }
                 }
@@ -247,7 +267,7 @@
                     const percentage = ((count / totalFrames) * 100).toFixed(2);
                     report += `Count of ${identity}: ${count} (${percentage}%)\n`;
                 });
-                report += `\nDominance Character(s): ${dominanceCharacters.length > 0 ? dominanceCharacters.join(', ') : 'None'}\n`;
+                report += `\nDominance Character(s): ${dominanceCharacters.length > 0 ? dominanceCharacters.sort().join(', ') : 'None'}\n`;
                 
                 return report;
             }
@@ -366,4 +386,5 @@
     </script>
 </body>
 </html>
+
 
