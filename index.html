@@ -35,8 +35,7 @@
 
     <main class="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
         <div class="max-w-7xl mx-auto">
-            <!-- Header and Upload Button -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <!-- Header and Upload Button --><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                  <div class="mb-4 sm:mb-0">
                     <h1 class="text-3xl font-bold text-gray-900">Image Annotation Tool</h1>
                     <p class="text-gray-600 mt-1">Upload a folder to start labeling images.</p>
@@ -50,26 +49,20 @@
                 <input type="file" id="folder-upload" webkitdirectory directory multiple>
             </div>
 
-            <!-- Main Content: Image and Checklist -->
-            <div id="main-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Image Viewer -->
-                <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex flex-col">
-                    <div class="flex-grow flex items-center justify-center bg-gray-200 rounded-lg h-[400px] lg:h-[600px] overflow-hidden">
-                        <img id="image-display" src="https://placehold.co/800x600/e2e8f0/cbd5e0?text=Upload+a+folder" alt="Selected image" class="w-full h-full object-cover rounded-md">
+            <!-- Main Content: Image and Checklist --><div id="main-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Image Viewer --><div class="lg:col-span-2 bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex flex-col">
+                    <!-- Changed object-cover to object-contain and ensured parent has a fixed height --><div class="flex-grow flex items-center justify-center bg-gray-200 rounded-lg h-[400px] lg:h-[600px] overflow-hidden">
+                        <img id="image-display" src="https://placehold.co/800x600/e2e8f0/cbd5e0?text=Upload+a+folder" alt="Selected image" class="h-full object-contain rounded-md">
                     </div>
                     <div id="image-info" class="text-center mt-4 text-lg font-medium text-gray-700">
-                        <!-- Image name and count will be injected here -->
-                    </div>
+                        <!-- Image name and count will be injected here --></div>
                 </div>
 
-                <!-- Checklist & Actions Panel -->
-                <div id="checklist-panel" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col">
+                <!-- Checklist & Actions Panel --><div id="checklist-panel" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col">
                     <h2 class="text-xl font-bold mb-4">Select Identities (Multiple)</h2>
                     <div id="checklist" class="space-y-3 flex-grow overflow-y-auto checklist-scroll pr-2">
-                        <!-- Checkboxes will be dynamically inserted here -->
-                    </div>
-                    <!-- Navigation Buttons (Moved Here) -->
-                    <div id="navigation-buttons" class="mt-auto pt-6 border-t border-gray-200 space-y-3">
+                        <!-- Checkboxes will be dynamically inserted here --></div>
+                    <!-- Navigation Buttons (Moved Here) --><div id="navigation-buttons" class="mt-auto pt-6 border-t border-gray-200 space-y-3">
                         <div class="flex space-x-3">
                             <button id="prev-button" class="w-full py-3 px-4 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
                             <button id="next-button" class="w-full py-3 px-4 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">Next</button>
@@ -79,8 +72,7 @@
                 </div>
             </div>
             
-            <!-- Welcome/Initial Message -->
-            <div id="welcome-message" class="text-center py-20">
+            <!-- Welcome/Initial Message --><div id="welcome-message" class="text-center py-20">
                 <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -92,7 +84,7 @@
     </main>
     
     <footer class="text-center p-4 text-sm text-gray-500">
-        <p>CSEAS Project (Data Labeling Interface) &copy; 2025</p>
+        <p>CSEAS TikTok Project (Data Labeling Interface) &copy; 2025</p>
     </footer>
 
     <script>
@@ -321,9 +313,7 @@
             nextButton.addEventListener('click', () => {
                 const selectedCheckboxes = checklistContainer.querySelectorAll('input[type="checkbox"]:checked');
 
-                // Allow proceeding with zero labels, but save the empty selection
-                // This logic is now handled by just saving and moving on.
-                // The check can be removed if you want to allow blank labels.
+                // Add validation check before saving
                 if (selectedCheckboxes.length === 0) {
                     checklistPanel.classList.add('border-red-500', 'border-2');
                     
@@ -410,6 +400,4 @@
     </script>
 </body>
 </html>
-
-
 
